@@ -17,7 +17,7 @@ An enterprise-ready, standalone WordPress addon for **Yoast SEO** that automatic
   * Fault-isolated: If an individual post fails, the error is logged while remaining posts in the batch continue uninterrupted.
   * Repeatable: Subsequent clicks automatically process the next batch of eligible posts until all content is optimized.
 * **Zero Overwrite Safety**: Posts that already have non-empty Yoast meta descriptions are automatically skipped.
-* **Configurable Gemini Models**: Choose between `Gemini 1.5 Flash` (default, high speed), `Gemini 2.0 Flash`, `Gemini 2.5 Flash`, or `Gemini 1.5 Pro`.
+* **Configurable Gemini Models**: Choose between `Gemini 1.5 Flash` (default), `Gemini 2.0 Flash`, `Gemini 2.5 Flash`, `Gemini 3.8 Flash`, `Gemini 3.6 Flash`, `Gemini 3.5 Flash-Lite`, `Gemini 3.1 Flash-Lite`, or `Gemini 1.5 Pro`.
 * **Security & Credential Protection**:
   * API keys are masked in the UI (`AIzaSy••••••••••••3XyZ`).
   * Requests are processed exclusively server-side via `wp_remote_post`.

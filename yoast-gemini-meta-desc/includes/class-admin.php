@@ -139,6 +139,25 @@ class Yoast_Gemini_Admin {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'yoast-gemini-meta-desc' ) );
 		}
 
+		// Handle standard (non-AJAX) form POST fallback.
+		if ( 'POST' === $_SERVER['REQUEST_METHOD'] && isset( $_POST['yoast_gemini_settings_nonce'] ) ) {
+			if ( wp_verify_nonce( sanitize_key( $_POST['yoast_gemini_settings_nonce'] ), 'yoast_gemini_save_settings_action' ) ) {
+				$posted_key   = isset( $_POST['api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) : '';
+				$posted_model = isset( $_POST['model'] ) ? sanitize_text_field( wp_unslash( $_POST['model'] ) ) : Yoast_Gemini_Client::DEFAULT_MODEL;
+				$clear_key    = ! empty( $_POST['clear_api_key'] );
+
+				Yoast_Gemini_Client::update_options(
+					[
+						'api_key'       => $posted_key,
+						'model'         => $posted_model,
+						'clear_api_key' => $clear_key,
+					]
+				);
+
+				echo '<div class="notice notice-success is-dismissible yoast-gemini-notice"><p><strong>' . esc_html__( 'Settings saved successfully.', 'yoast-gemini-meta-desc' ) . '</strong></p></div>';
+			}
+		}
+
 		$options          = Yoast_Gemini_Client::get_options();
 		$masked_key       = Yoast_Gemini_Client::mask_api_key( $options['api_key'] );
 		$available_models = Yoast_Gemini_Client::get_available_models();
@@ -178,7 +197,8 @@ class Yoast_Gemini_Admin {
 						</h2>
 					</div>
 					<div class="card-body">
-						<form id="yoast-gemini-settings-form">
+						<form id="yoast-gemini-settings-form" method="post" action="">
+							<?php wp_nonce_field( 'yoast_gemini_save_settings_action', 'yoast_gemini_settings_nonce' ); ?>
 							<div class="form-group">
 								<label for="gemini-api-key">
 									<?php esc_html_e( 'Google Gemini API Key', 'yoast-gemini-meta-desc' ); ?>
@@ -205,12 +225,17 @@ class Yoast_Gemini_Admin {
 										'<a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio <span class="dashicons dashicons-external"></span></a>'
 									);
 									?>
-									<?php if ( ! empty( $masked_key ) ) : ?>
-										<span class="key-saved-notice">
-											<span class="dashicons dashicons-yes-alt"></span>
-											<?php printf( esc_html__( 'Key configured: %s', 'yoast-gemini-meta-desc' ), esc_html( $masked_key ) ); ?>
-										</span>
-									<?php endif; ?>
+									<span class="key-status-container">
+										<?php if ( ! empty( $masked_key ) ) : ?>
+											<span class="key-saved-notice">
+												<span class="dashicons dashicons-yes-alt"></span>
+												<?php printf( esc_html__( 'Key configured: %s', 'yoast-gemini-meta-desc' ), esc_html( $masked_key ) ); ?>
+												<button type="button" class="button-link" id="btn-clear-key" style="margin-left: 8px; color: #d63638; text-decoration: underline; font-size: 12px; cursor: pointer;">
+													<?php esc_html_e( '(Remove Key)', 'yoast-gemini-meta-desc' ); ?>
+												</button>
+											</span>
+										<?php endif; ?>
+									</span>
 								</p>
 							</div>
 

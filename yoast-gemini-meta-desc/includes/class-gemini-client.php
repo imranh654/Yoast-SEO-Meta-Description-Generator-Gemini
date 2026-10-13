@@ -70,10 +70,14 @@ class Yoast_Gemini_Client {
 	public static function update_options( array $options ) {
 		$current = self::get_options();
 
-		if ( isset( $options['api_key'] ) ) {
+		// Handle explicit clearing of the API key if requested.
+		if ( ! empty( $options['clear_api_key'] ) ) {
+			$current['api_key'] = '';
+		} elseif ( isset( $options['api_key'] ) ) {
 			$api_key = sanitize_text_field( trim( $options['api_key'] ) );
-			// If input contains mask symbols, preserve the existing key.
-			if ( strpos( $api_key, '••••' ) === false ) {
+			// Only update if a non-empty key without bullet mask characters is provided.
+			// If empty or masked, preserve the existing saved key.
+			if ( '' !== $api_key && false === strpos( $api_key, '•' ) && false === strpos( $api_key, '&#8226;' ) ) {
 				$current['api_key'] = $api_key;
 			}
 		}
@@ -133,13 +137,20 @@ class Yoast_Gemini_Client {
 	 */
 	public static function test_connection( $api_key = null, $model = null ) {
 		$options = self::get_options();
-		$key     = $api_key !== null ? trim( $api_key ) : $options['api_key'];
-		$mod     = $model !== null ? trim( $model ) : $options['model'];
+
+		// If key argument is empty or contains bullet mask characters, use saved key.
+		if ( null === $api_key || '' === trim( (string) $api_key ) || false !== strpos( (string) $api_key, '•' ) ) {
+			$key = $options['api_key'];
+		} else {
+			$key = trim( (string) $api_key );
+		}
+
+		$mod = ( null !== $model && '' !== trim( (string) $model ) ) ? trim( (string) $model ) : $options['model'];
 
 		if ( empty( $key ) ) {
 			return [
 				'success' => false,
-				'message' => __( 'Please enter a Google Gemini API key first.', 'yoast-gemini-meta-desc' ),
+				'message' => __( 'Please enter and save your Google Gemini API key first.', 'yoast-gemini-meta-desc' ),
 			];
 		}
 

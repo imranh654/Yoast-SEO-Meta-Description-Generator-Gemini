@@ -57,21 +57,32 @@ class Yoast_Gemini_Batch_Processor {
 	public function ajax_save_settings() {
 		$this->verify_request();
 
-		$api_key = isset( $_POST['api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) : '';
-		$model   = isset( $_POST['model'] ) ? sanitize_text_field( wp_unslash( $_POST['model'] ) ) : Yoast_Gemini_Client::DEFAULT_MODEL;
+		$api_key       = isset( $_POST['api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) : '';
+		$model         = isset( $_POST['model'] ) ? sanitize_text_field( wp_unslash( $_POST['model'] ) ) : Yoast_Gemini_Client::DEFAULT_MODEL;
+		$clear_api_key = ! empty( $_POST['clear_api_key'] );
 
-		$updated = Yoast_Gemini_Client::update_options(
+		Yoast_Gemini_Client::update_options(
 			[
-				'api_key' => $api_key,
-				'model'   => $model,
+				'api_key'       => $api_key,
+				'model'         => $model,
+				'clear_api_key' => $clear_api_key,
 			]
 		);
 
 		$options = Yoast_Gemini_Client::get_options();
+		$has_key = ! empty( $options['api_key'] );
+
+		$message = __( 'Settings saved successfully.', 'yoast-gemini-meta-desc' );
+		if ( $clear_api_key ) {
+			$message = __( 'Gemini API key has been removed.', 'yoast-gemini-meta-desc' );
+		} elseif ( $has_key ) {
+			$message = __( 'Settings saved successfully. Gemini API key is configured and active.', 'yoast-gemini-meta-desc' );
+		}
 
 		wp_send_json_success(
 			[
-				'message'    => __( 'Settings saved successfully.', 'yoast-gemini-meta-desc' ),
+				'message'    => $message,
+				'has_key'    => $has_key,
 				'masked_key' => Yoast_Gemini_Client::mask_api_key( $options['api_key'] ),
 				'model'      => $options['model'],
 			]
@@ -84,11 +95,11 @@ class Yoast_Gemini_Batch_Processor {
 	public function ajax_test_api() {
 		$this->verify_request();
 
-		$api_key = isset( $_POST['api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) : null;
+		$api_key = isset( $_POST['api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) : '';
 		$model   = isset( $_POST['model'] ) ? sanitize_text_field( wp_unslash( $_POST['model'] ) ) : null;
 
-		// If input has mask symbols, use saved key.
-		if ( $api_key !== null && strpos( $api_key, '••••' ) !== false ) {
+		// If input is empty or has mask symbols, use saved key.
+		if ( empty( $api_key ) || false !== strpos( $api_key, '•' ) ) {
 			$api_key = null;
 		}
 

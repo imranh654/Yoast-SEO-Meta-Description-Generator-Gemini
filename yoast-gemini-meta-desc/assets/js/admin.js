@@ -21,6 +21,9 @@
 			// Settings form submission.
 			$('#yoast-gemini-settings-form').on('submit', this.handleSaveSettings);
 
+			// Clear saved API key.
+			$(document).on('click', '#btn-clear-key', this.handleClearKey);
+
 			// Test API connection.
 			$('#btn-test-api').on('click', this.handleTestApi);
 
@@ -79,13 +82,15 @@
 							.text(res.data.message)
 							.fadeIn();
 
-						if (res.data.masked_key) {
+						if (res.data.has_key && res.data.masked_key) {
 							yoastGeminiData.hasApiKey = true;
 							$('#gemini-api-key').val('').attr('placeholder', res.data.masked_key);
-							$('.key-saved-notice').remove();
-							$('.description').append(
-								'<span class="key-saved-notice"><span class="dashicons dashicons-yes-alt"></span> Key configured: ' +
-								res.data.masked_key + '</span>'
+							$('.key-status-container').html(
+								'<span class="key-saved-notice">' +
+								'<span class="dashicons dashicons-yes-alt"></span> ' +
+								'Key configured: ' + res.data.masked_key + ' ' +
+								'<button type="button" class="button-link" id="btn-clear-key" style="margin-left: 8px; color: #d63638; text-decoration: underline; font-size: 12px; cursor: pointer;">(Remove Key)</button>' +
+								'</span>'
 							);
 						}
 					} else {
@@ -104,6 +109,58 @@
 			});
 		},
 
+		handleClearKey: function (e) {
+			e.preventDefault();
+			if (!confirm('Are you sure you want to remove the saved Gemini API key?')) {
+				return;
+			}
+
+			const $spinner = $('#settings-spinner');
+			const $feedback = $('#settings-feedback');
+			const $btn = $('#btn-save-settings');
+
+			$spinner.addClass('is-active');
+			$btn.prop('disabled', true);
+			$feedback.hide().removeClass('feedback-success feedback-error');
+
+			$.ajax({
+				url: yoastGeminiData.ajaxUrl,
+				type: 'POST',
+				dataType: 'json',
+				data: {
+					action: 'yoast_gemini_save_settings',
+					nonce: yoastGeminiData.nonce,
+					api_key: '',
+					clear_api_key: 1,
+					model: $('#gemini-model').val()
+				},
+				success: function (res) {
+					$spinner.removeClass('is-active');
+					$btn.prop('disabled', false);
+
+					if (res.success) {
+						yoastGeminiData.hasApiKey = false;
+						$('#gemini-api-key').val('').attr('placeholder', 'Enter your Gemini API key (AIzaSy...)');
+						$('.key-status-container').empty();
+						$feedback.addClass('feedback-success')
+							.text(res.data.message || 'Gemini API key has been removed.')
+							.fadeIn();
+					} else {
+						$feedback.addClass('feedback-error')
+							.text(res.data.message || 'Failed to remove API key.')
+							.fadeIn();
+					}
+				},
+				error: function () {
+					$spinner.removeClass('is-active');
+					$btn.prop('disabled', false);
+					$feedback.addClass('feedback-error')
+						.text('Server communication error. Please try again.')
+						.fadeIn();
+				}
+			});
+		},
+
 		handleTestApi: function (e) {
 			e.preventDefault();
 			const $btn = $(this);
@@ -111,6 +168,14 @@
 			const $feedback = $('#settings-feedback');
 			const apiKey = $('#gemini-api-key').val().trim();
 			const model = $('#gemini-model').val();
+
+			if (!yoastGeminiData.hasApiKey && !apiKey) {
+				$feedback.addClass('feedback-error')
+					.text(yoastGeminiData.strings.keyMissingError || 'Please enter and save your Gemini API key first.')
+					.fadeIn();
+				$('#gemini-api-key').focus();
+				return;
+			}
 
 			$spinner.addClass('is-active');
 			$btn.prop('disabled', true);
@@ -212,9 +277,14 @@
 				return;
 			}
 
-			if (!yoastGeminiData.hasApiKey && !$('#gemini-api-key').val().trim()) {
-				alert(yoastGeminiData.strings.keyMissingError);
-				$('#gemini-api-key').focus();
+			if (!yoastGeminiData.hasApiKey) {
+				if ($('#gemini-api-key').val().trim()) {
+					alert('Please click "Save Settings" to save your Gemini API key before generating meta descriptions.');
+					$('#btn-save-settings').focus();
+				} else {
+					alert(yoastGeminiData.strings.keyMissingError);
+					$('#gemini-api-key').focus();
+				}
 				return;
 			}
 

@@ -436,6 +436,7 @@
 					url: yoastGeminiData.ajaxUrl,
 					type: 'POST',
 					dataType: 'json',
+					timeout: 120000,
 					data: {
 						action: 'yoast_gemini_process_single_post',
 						nonce: yoastGeminiData.nonce,

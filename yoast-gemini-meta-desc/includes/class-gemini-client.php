@@ -38,6 +38,11 @@ class Yoast_Gemini_Client {
 	const API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
 
 	/**
+	 * HTTP timeout in seconds for Gemini API requests (accommodates LLM generation latency).
+	 */
+	const API_TIMEOUT = 60;
+
+	/**
 	 * Options key for plugin settings.
 	 */
 	const OPTION_KEY = 'yoast_gemini_meta_settings';
@@ -178,9 +183,10 @@ class Yoast_Gemini_Client {
 		$response = wp_remote_post(
 			$endpoint,
 			[
-				'headers' => [ 'Content-Type' => 'application/json' ],
-				'body'    => wp_json_encode( $body ),
-				'timeout' => 20,
+				'headers'     => [ 'Content-Type' => 'application/json' ],
+				'body'        => wp_json_encode( $body ),
+				'timeout'     => self::API_TIMEOUT,
+				'httpversion' => '1.1',
 			]
 		);
 
@@ -270,10 +276,10 @@ class Yoast_Gemini_Client {
 			];
 		}
 
-		// Truncate content context to ~1,500 words to conserve token limits while preserving rich context.
+		// Truncate content context to ~800 words to conserve tokens, reduce API latency, and prevent timeouts while preserving rich context.
 		$words = explode( ' ', $clean_content );
-		if ( count( $words ) > 1500 ) {
-			$clean_content = implode( ' ', array_slice( $words, 0, 1500 ) );
+		if ( count( $words ) > 800 ) {
+			$clean_content = implode( ' ', array_slice( $words, 0, 800 ) );
 		}
 
 		// 2. Build the primary prompt.
@@ -435,55 +441,89 @@ class Yoast_Gemini_Client {
 			],
 		];
 
-		$response = wp_remote_post(
-			$endpoint,
-			[
-				'headers' => [ 'Content-Type' => 'application/json' ],
-				'body'    => wp_json_encode( $body ),
-				'timeout' => 30,
-			]
-		);
+		$encoded_body = wp_json_encode( $body );
+		$max_attempts = 2;
+		$last_error   = '';
 
-		if ( is_wp_error( $response ) ) {
+		for ( $attempt = 1; $attempt <= $max_attempts; $attempt++ ) {
+			// Extend PHP execution time limit for this generation cycle.
+			if ( function_exists( 'set_time_limit' ) ) {
+				@set_time_limit( 120 );
+			}
+
+			$response = wp_remote_post(
+				$endpoint,
+				[
+					'headers'     => [ 'Content-Type' => 'application/json' ],
+					'body'        => $encoded_body,
+					'timeout'     => self::API_TIMEOUT,
+					'httpversion' => '1.1',
+				]
+			);
+
+			if ( is_wp_error( $response ) ) {
+				$err_msg    = $response->get_error_message();
+				$last_error = $err_msg;
+
+				// If timeout or connection error, wait briefly and retry if attempts remain.
+				$is_timeout = ( false !== strpos( $err_msg, 'timed out' ) || false !== strpos( $err_msg, 'cURL error 28' ) );
+				if ( $is_timeout && $attempt < $max_attempts ) {
+					sleep( 2 );
+					continue;
+				}
+
+				return [
+					'success' => false,
+					'text'    => '',
+					'error'   => sprintf(
+						/* translators: %s: Error message */
+						__( 'HTTP request failed: %s', 'yoast-gemini-meta-desc' ),
+						$err_msg
+					),
+				];
+			}
+
+			$status_code = wp_remote_retrieve_response_code( $response );
+			$raw_body    = wp_remote_retrieve_body( $response );
+			$data        = json_decode( $raw_body, true );
+
+			// If rate limited (429) or temporary server unavailable (503), retry once after pause.
+			if ( in_array( $status_code, [ 429, 503 ], true ) && $attempt < $max_attempts ) {
+				sleep( 2 );
+				continue;
+			}
+
+			if ( 200 !== $status_code ) {
+				$message = isset( $data['error']['message'] )
+					? $data['error']['message']
+					: sprintf( __( 'Gemini API returned status code %d', 'yoast-gemini-meta-desc' ), $status_code );
+
+				return [
+					'success' => false,
+					'text'    => '',
+					'error'   => $message,
+				];
+			}
+
+			if ( empty( $data['candidates'][0]['content']['parts'][0]['text'] ) ) {
+				return [
+					'success' => false,
+					'text'    => '',
+					'error'   => __( 'Gemini returned an empty response candidate.', 'yoast-gemini-meta-desc' ),
+				];
+			}
+
 			return [
-				'success' => false,
-				'text'    => '',
-				'error'   => sprintf(
-					/* translators: %s: Error message */
-					__( 'HTTP request failed: %s', 'yoast-gemini-meta-desc' ),
-					$response->get_error_message()
-				),
-			];
-		}
-
-		$status_code = wp_remote_retrieve_response_code( $response );
-		$raw_body    = wp_remote_retrieve_body( $response );
-		$data        = json_decode( $raw_body, true );
-
-		if ( 200 !== $status_code ) {
-			$message = isset( $data['error']['message'] )
-				? $data['error']['message']
-				: sprintf( __( 'Gemini API returned status code %d', 'yoast-gemini-meta-desc' ), $status_code );
-
-			return [
-				'success' => false,
-				'text'    => '',
-				'error'   => $message,
-			];
-		}
-
-		if ( empty( $data['candidates'][0]['content']['parts'][0]['text'] ) ) {
-			return [
-				'success' => false,
-				'text'    => '',
-				'error'   => __( 'Gemini returned an empty response candidate.', 'yoast-gemini-meta-desc' ),
+				'success' => true,
+				'text'    => (string) $data['candidates'][0]['content']['parts'][0]['text'],
+				'error'   => '',
 			];
 		}
 
 		return [
-			'success' => true,
-			'text'    => (string) $data['candidates'][0]['content']['parts'][0]['text'],
-			'error'   => '',
+			'success' => false,
+			'text'    => '',
+			'error'   => ! empty( $last_error ) ? $last_error : __( 'Request timed out after multiple attempts.', 'yoast-gemini-meta-desc' ),
 		];
 	}
 

@@ -1,0 +1,484 @@
+/**
+ * Yoast SEO Meta Description Generator (Gemini)
+ * Admin Dashboard Styles
+ */
+
+.yoast-gemini-wrap {
+	max-width: 1280px;
+	margin: 20px 20px 40px 0;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* Header Banner */
+.yoast-gemini-header {
+	background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+	color: #ffffff;
+	padding: 24px 30px;
+	border-radius: 12px;
+	margin-bottom: 24px;
+	box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+}
+
+.yoast-gemini-header h1 {
+	color: #ffffff;
+	font-size: 24px;
+	font-weight: 700;
+	margin: 0 0 8px 0;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.yoast-gemini-header h1 .dashicons {
+	font-size: 28px;
+	width: 28px;
+	height: 28px;
+	color: #60a5fa;
+}
+
+.badge-gemini {
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+	color: #ffffff;
+	padding: 4px 10px;
+	border-radius: 9999px;
+	vertical-align: middle;
+}
+
+.yoast-gemini-tagline {
+	color: #94a3b8;
+	font-size: 14px;
+	margin: 0;
+	line-height: 1.5;
+}
+
+.yoast-gemini-notice {
+	margin-bottom: 20px !important;
+	border-radius: 6px;
+}
+
+/* Grid Layout */
+.yoast-gemini-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+/* Cards */
+.yoast-gemini-card {
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	border-radius: 10px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	overflow: hidden;
+}
+
+.yoast-gemini-card .card-header {
+	background: #f8fafc;
+	border-bottom: 1px solid #e2e8f0;
+	padding: 16px 24px;
+}
+
+.yoast-gemini-card .card-header h2 {
+	margin: 0;
+	font-size: 16px;
+	font-weight: 600;
+	color: #1e293b;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.yoast-gemini-card .card-header h2 .dashicons {
+	color: #2563eb;
+}
+
+.yoast-gemini-card .card-body {
+	padding: 24px;
+}
+
+/* Form Styles */
+.form-group {
+	margin-bottom: 20px;
+}
+
+.form-group label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 6px;
+	color: #334155;
+	font-size: 13px;
+}
+
+.form-group label .required {
+	color: #ef4444;
+}
+
+.api-key-input-wrapper {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	max-width: 450px;
+}
+
+.api-key-input-wrapper input {
+	flex: 1;
+	font-family: monospace;
+	font-size: 13px;
+}
+
+.form-actions {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-top: 20px;
+}
+
+.form-actions .button {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 36px;
+	padding: 0 14px;
+}
+
+.key-saved-notice {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	color: #16a34a;
+	font-weight: 500;
+	margin-left: 10px;
+}
+
+.key-saved-notice .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.yoast-gemini-feedback {
+	margin-top: 14px;
+	padding: 10px 14px;
+	border-radius: 6px;
+	font-size: 13px;
+	font-weight: 500;
+}
+
+.yoast-gemini-feedback.feedback-success {
+	background: #ecfdf5;
+	border: 1px solid #a7f3d0;
+	color: #065f46;
+}
+
+.yoast-gemini-feedback.feedback-error {
+	background: #fef2f2;
+	border: 1px solid #fecaca;
+	color: #991b1b;
+}
+
+/* Post Type Selector */
+.post-type-selector-wrap {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 20px;
+	background: #f8fafc;
+	padding: 12px 16px;
+	border-radius: 8px;
+	border: 1px solid #e2e8f0;
+}
+
+.post-type-selector-wrap label {
+	font-size: 14px;
+	color: #1e293b;
+}
+
+.post-type-selector-wrap select {
+	min-width: 200px;
+	height: 36px;
+	font-weight: 500;
+}
+
+/* Stats Counters Grid */
+.stats-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 16px;
+	margin-bottom: 24px;
+}
+
+.stat-card {
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	padding: 16px 20px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	position: relative;
+	overflow: hidden;
+}
+
+.stat-card::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: 4px;
+}
+
+.stat-total::before { background-color: #64748b; }
+.stat-completed::before { background-color: #16a34a; }
+.stat-eligible::before { background-color: #ea580c; }
+.stat-remaining::before { background-color: #2563eb; }
+
+.stat-value {
+	font-size: 26px;
+	font-weight: 700;
+	color: #0f172a;
+	line-height: 1.2;
+}
+
+.stat-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: #64748b;
+	text-transform: uppercase;
+	letter-spacing: 0.4px;
+}
+
+/* Batch Action Bar */
+.batch-action-bar {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	flex-wrap: wrap;
+	padding: 16px 0 24px 0;
+	border-bottom: 1px solid #e2e8f0;
+}
+
+.batch-action-bar .button-hero {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	height: 44px;
+	padding: 0 24px;
+	font-size: 14px;
+	font-weight: 600;
+	background: #2563eb;
+	border-color: #1d4ed8;
+	box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+}
+
+.batch-action-bar .button-hero:hover:not(:disabled) {
+	background: #1d4ed8;
+	border-color: #1e40af;
+}
+
+.batch-action-bar .button-hero:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.batch-notice-text {
+	margin: 0;
+	font-size: 13px;
+	color: #64748b;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+/* Batch Progress Box */
+.batch-progress-box {
+	background: #f8fafc;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	padding: 20px;
+	margin: 20px 0;
+}
+
+.progress-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 12px;
+	font-size: 13px;
+}
+
+.progress-title {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: #0f172a;
+}
+
+.progress-counter {
+	font-weight: 600;
+	color: #475569;
+}
+
+.progress-bar-container {
+	height: 12px;
+	background: #e2e8f0;
+	border-radius: 9999px;
+	overflow: hidden;
+	margin-bottom: 14px;
+}
+
+.progress-bar-fill {
+	height: 100%;
+	background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
+	border-radius: 9999px;
+	transition: width 0.3s ease;
+}
+
+.batch-stats-summary {
+	display: flex;
+	gap: 18px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.summary-item {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.summary-success { color: #16a34a; }
+.summary-failed { color: #dc2626; }
+.summary-skipped { color: #d97706; }
+
+/* All Completed Banner */
+.all-completed-banner {
+	background: #ecfdf5;
+	border: 1px solid #86efac;
+	border-radius: 8px;
+	padding: 18px 24px;
+	margin: 20px 0;
+}
+
+.all-completed-banner .banner-inner {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.all-completed-banner .dashicons-awards {
+	font-size: 40px;
+	width: 40px;
+	height: 40px;
+	color: #16a34a;
+}
+
+.all-completed-banner h3 {
+	margin: 0 0 4px 0;
+	color: #065f46;
+	font-size: 16px;
+}
+
+.all-completed-banner p {
+	margin: 0;
+	color: #047857;
+	font-size: 13px;
+}
+
+/* Results Table */
+.results-table-section {
+	margin-top: 24px;
+}
+
+.results-table-section h3 {
+	font-size: 15px;
+	font-weight: 600;
+	color: #1e293b;
+	margin: 0 0 12px 0;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.yoast-gemini-results-table {
+	border: 1px solid #e2e8f0;
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+.yoast-gemini-results-table th {
+	font-weight: 600;
+	background: #f8fafc;
+	color: #475569;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.4px;
+}
+
+.yoast-gemini-results-table .col-id { width: 70px; }
+.yoast-gemini-results-table .col-title { width: 220px; }
+.yoast-gemini-results-table .col-length { width: 100px; text-align: center; }
+.yoast-gemini-results-table .col-status { width: 110px; text-align: center; }
+
+.char-badge {
+	display: inline-block;
+	padding: 3px 8px;
+	border-radius: 9999px;
+	font-size: 11px;
+	font-weight: 600;
+}
+
+.char-badge-valid {
+	background: #dcfce7;
+	color: #15803d;
+}
+
+.char-badge-invalid {
+	background: #fee2e2;
+	color: #b91c1c;
+}
+
+.status-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 3px 8px;
+	border-radius: 9999px;
+	font-size: 11px;
+	font-weight: 600;
+}
+
+.status-badge-success {
+	background: #dcfce7;
+	color: #15803d;
+}
+
+.status-badge-failed {
+	background: #fee2e2;
+	color: #b91c1c;
+}
+
+.status-badge-skipped {
+	background: #fef3c7;
+	color: #b45309;
+}
+
+.desc-text {
+	color: #334155;
+	font-size: 13px;
+	line-height: 1.45;
+}
+
+.error-text {
+	color: #dc2626;
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.text-center { text-align: center; }
+.text-muted { color: #94a3b8; }

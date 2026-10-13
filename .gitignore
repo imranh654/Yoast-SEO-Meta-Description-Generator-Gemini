@@ -1,0 +1,8 @@
+# Ignore reference Yoast SEO plugin files
+wordpress-seo/
+
+# Temporary / OS files
+.DS_Store
+Thumbs.db
+*.log
+scratch/

@@ -5,4 +5,5 @@ wordpress-seo/
 .DS_Store
 Thumbs.db
 *.log
+*.zip
 scratch/
